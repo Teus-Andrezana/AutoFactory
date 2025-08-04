@@ -90,6 +90,7 @@ def stocker(name):
     print(f'{name}: "No work"')
     sleep(2)
 
+## the def below is in test stages
 def identify(map, item): # seek for the item's location in the matrix
   pos = 0
   for i in range(len(map)):
