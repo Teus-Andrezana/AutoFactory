@@ -1,0 +1,112 @@
+from random import randint, choice, uniform
+from threading import Thread, Lock
+from time import sleep
+
+Objeto = {}
+
+line_lock = Lock()
+num_lock = Lock()
+line = []
+max_capacity = 10
+numeric=0
+machine_meta = 0
+stock = []
+
+def machine():
+  global line
+  global max_capacity
+  global numeric
+  global machine_meta
+  counter_added = 0
+  counter_full=0
+  print("Machine started.")
+  while(machine_meta <= 20):
+    with num_lock:
+      numeric+=1
+    with line_lock:
+      if(len(line)!=max_capacity):
+        line.insert(0, numeric)
+        machine_meta+=1
+        print("added successfully.")
+      else:
+        print("Line is full!")
+    sleep(0.2)
+  print("End of production.")
+
+def line_on(line_group):
+  return True if len(line_group)>=1 else False
+
+def caution(name):
+  accident_role = phrases = [
+    "fell down",
+    "twisted my ankle",
+    "hurt my hand",
+    "saw what they shouldn't have seen",
+    "was traumatized",
+    "slipped up on their own life choices"
+]
+  resting_actions = phrases = [
+    "sleeping",
+    "resting",
+    "talking",
+    "healing",
+    "waiting for coffee",
+    "going to the hospital",
+    "going back home"
+]
+  accident_chance = randint(0,1000)
+  if(accident_role == 0): # randomly choose an accident condition
+    accident_mode = choice(accident_role)
+    print(f"{name} {accident_mode}!")
+    resting_mode = choice(resting_actions)
+    if(resting_mode.startswith("going")): # if its necessary to go out, it ends up its work
+      print(f"{name} is {resting_mode}! It left its shift due to medical reasons.")
+      return 1
+    print(f"{name} is {resting_mode}! It's better take an eye on it...")
+    return 0
+
+def stocker(name):
+  global line
+  global machine_meta
+  global stock
+  print(f"{name} started to work.")
+  standard = 1
+  while(machine_meta>=20):
+    with line_lock:
+      if(line_on(line)==True):
+        sleep(uniform(0.5, standard))
+        if(caution(name)==0):
+          break
+        removed = line.pop() #pop out the last item in line
+        print(f"{name} picked up item {removed}")
+        sleep(uniform(0.5,1.5))
+        stock.append(removed) #add the removed item from line to stock
+        print(f"{name} added {removed} to the stock pile")
+      else: # announce when there is no item to pick up
+        print(f'{name}: "We are out of products"')
+        sleep(2)
+
+  if(line_on(stock)==False): #announce when stock is full
+    print(f'{name}: "No work"')
+    sleep(2)
+
+def identify(map, item): # seek for the item's location in the matrix
+  pos = 0
+  for i in range(len(map)):
+    for j in range(len(map[i])):
+      if(map[i][j]==item):
+        pos = (i,j)
+  return(pos)
+
+if __name__ == "__main__":
+  liner = Thread(target=machine)
+  liner.start()
+
+  worker_1 = Thread(target=stocker, args=("Cloue",))
+  worker_2 = Thread(target=stocker, args=("Bertha",))
+  worker_1.start()
+  worker_2.start()
+
+  worker_1.join()
+  worker_2.join()
+  liner.join()
