@@ -6,19 +6,19 @@ Objeto = {}
 
 line_lock = Lock()
 num_lock = Lock()
-line = []
+line:list[int] = []
 max_capacity = 10
 numeric=0
 machine_meta = 0
-stock = []
+stock:list[int] = []
 
 def machine():
   global line
   global max_capacity
   global numeric
   global machine_meta
-  counter_added = 0
-  counter_full=0
+  # counter_added:int = 0
+  # counter_full:int=0
   print("Machine started.")
   while(machine_meta <= 20):
     with num_lock:
@@ -33,11 +33,11 @@ def machine():
     sleep(0.2)
   print("End of production.")
 
-def line_on(line_group):
+def line_on(line_group:list[int])->bool:
   return True if len(line_group)>=1 else False
 
-def caution(name):
-  accident_role = phrases = [
+def caution(name:str)->int:
+  accident_role:list[str] = [
     "fell down",
     "twisted my ankle",
     "hurt my hand",
@@ -45,7 +45,7 @@ def caution(name):
     "was traumatized",
     "slipped up on their own life choices"
 ]
-  resting_actions = phrases = [
+  resting_actions:list[str] = [
     "sleeping",
     "resting",
     "talking",
@@ -54,8 +54,8 @@ def caution(name):
     "going to the hospital",
     "going back home"
 ]
-  accident_chance = randint(0,1000)
-  if(accident_role == 0): # randomly choose an accident condition
+  accident_chance:int = randint(0,1000)
+  if(accident_chance == 0): # randomly choose an accident condition
     accident_mode = choice(accident_role)
     print(f"{name} {accident_mode}!")
     resting_mode = choice(resting_actions)
@@ -65,7 +65,7 @@ def caution(name):
     print(f"{name} is {resting_mode}! It's better take an eye on it...")
     return 0
 
-def stocker(name):
+def stocker(name:str)->None:
   global line
   global machine_meta
   global stock
@@ -91,8 +91,8 @@ def stocker(name):
     sleep(2)
 
 ## the def below is in test stages
-def identify(map, item): # seek for the item's location in the matrix
-  pos = 0
+def identify(map:list[str], item:str)->tuple[int, int]: # seek for the item's location in the matrix
+  pos:tuple[int, int] = (0,0)
   for i in range(len(map)):
     for j in range(len(map[i])):
       if(map[i][j]==item):
